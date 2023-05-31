@@ -58,4 +58,42 @@ router.post("/categorias/nova", (req, res) => {
     }
 })
 
+router.get('/categorias/edit/:id', (req, res) => {
+    Categoria.findOne({_id: req.params.id}).lean().then((categoria) => {
+        res.render('admin/editcategorias', {categoria: categoria})
+    }).catch((err) => {
+        req.flash('error_msg', 'essa categoria nao existe')
+        res.redirect('/admin/categorias')
+    })
+})
+
+router.post('/categorias/edit', (req, res) => {
+    Categoria.findOne({_id: req.body.id}).then((categoria) => {
+        categoria.nome = req.body.nome
+        categoria.slug = req.body.slug
+
+        categoria.save().then(() => {
+            req.flash('success_msg', 'categoria editada com sucesso.')
+            res.redirect('/admin/categorias')
+        }).catch((err) => {
+            req.flash('error_msg', 'houve um erro ao salvar edicao a categoria')
+            res.redirect('/admin/categorias')
+        })
+    }).catch((err) => {
+        req.flash('error_msg', 'houve um erro ao editar a categoria')
+        res.redirect('/admin/categorias')
+    })
+})
+
+
+router.post('/categorias/deletar', (req, res) => {
+    Categoria.deleteOne({_id: req.body.id}).then(() => {
+        req.flash('success_msg', 'categoria editada com sucesso.')
+        res.redirect('/admin/categorias'
+        )}).catch((err) => {
+        req.flash('error_msg', 'houve um erro ao deletar a categoria')
+        res.redirect('/admin/categorias')
+    })
+})
+
 module.exports = router
